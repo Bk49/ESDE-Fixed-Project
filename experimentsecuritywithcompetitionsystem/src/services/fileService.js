@@ -65,9 +65,7 @@ module.exports.createFileData = async (imageURL, publicId, userId, designTitle, 
 
 } //End of createFileData
 
-module.exports.getFileData = (userId, pageNumber, search) => {
-
-    console.log('getFileData method is called.');
+module.exports.getFileData = async (userId, pageNumber, search) => {
     const page = pageNumber;
     if (search == null) { search = ''; };
     const limit = 4; //Due to lack of test files, I have set a 3 instead of larger number such as 10 records per page
@@ -95,29 +93,35 @@ module.exports.getFileData = (userId, pageNumber, search) => {
     //--------------------------------------------------------------------
     //designFileDataQuery = `CALL sp_get_paged_file_records(?,?,?,?, @total_records); SELECT @total_records total_records;`;
 
-    return new Promise((resolve, reject) => {
-        //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-        //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-        pool.getConnection((err, connection) => {
-            if (err) {
-                console.log('Database connection error ', err);
-                resolve(err);
-            } else {
-                console.log('Executing query to obtain 1 page of 3 data');
-                connection.query(designFileDataQuery, parameters, (err, results) => {
-                    if (err) {
-                        console.log('Error on query on reading data from the file table', err);
-                        reject(err);
-                    } else {
-                        //The following code which access the SQL return value took 2 hours of trial
-                        //and error.
-                        console.log('Accessing total number of rows : ', results[2][0].total_records);
-                        resolve(results);
-                    }
-                    connection.release();
-                });
-            }
-        });
-    }); //End of new Promise object creation
+    try{
+        return await pool.query(designFileDataQuery,parameters)
+    }catch(err){
+        return err
+    }
+
+    // return new Promise((resolve, reject) => {
+    //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
+    //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
+    //     pool.getConnection((err, connection) => {
+    //         if (err) {
+    //             console.log('Database connection error ', err);
+    //             resolve(err);
+    //         } else {
+    //             console.log('Executing query to obtain 1 page of 3 data');
+    //             connection.query(designFileDataQuery, parameters, (err, results) => {
+    //                 if (err) {
+    //                     console.log('Error on query on reading data from the file table', err);
+    //                     reject(err);
+    //                 } else {
+    //                     //The following code which access the SQL return value took 2 hours of trial
+    //                     //and error.
+    //                     console.log('Accessing total number of rows : ', results[2][0].total_records);
+    //                     resolve(results);
+    //                 }
+    //                 connection.release();
+    //             });
+    //         }
+    //     });
+    // }); //End of new Promise object creation
 
 } //End of getFileData

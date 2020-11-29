@@ -14,9 +14,9 @@ exports.processDesignSubmission = (req, res, next) => {
         imageUrl = results.imageURL
         return fileDataManager.createFileData(results.imageURL, results.publicId, userId, designTitle, designDescription)
     }).then((results)=>{
-        res.status(200).json({message:'File Submission completed.', imageURL:imageUrl})
+        return res.status(200).json({message:'File Submission completed.', imageURL:imageUrl})
     }).catch((err)=>{
-        res.status(500).json({message:'Unable to complete file submission'})
+        return res.status(500).json({message:'Unable to complete file submission'})
     })// , async function(error, result) {
     //     console.log('check result variable in fileDataManager.upload code block\n', result);
     //     console.log('check error variable in fileDataManager.upload code block\n', error);
@@ -52,88 +52,122 @@ exports.processGetSubmissionData = async(req, res, next) => {
     let pageNumber = req.params.pagenumber;
     let search = req.params.search;
     let userId = req.body.userId;
-    try {
-        let results = await fileDataManager.getFileData(userId, pageNumber, search);
-        console.log('Inspect result variable inside processGetSubmissionData code\n', results);
-        if (results) {
-            var jsonResult = {
-                'number_of_records': results[0].length,
-                'page_number': pageNumber,
-                'filedata': results[0],
-                'total_number_of_records': results[2][0].total_records
-            }
-            return res.status(200).json(jsonResult);
+
+    fileDataManager.getFileData(userId, pageNumber, search).then((results)=>{
+        // console.log(results)
+        const jsonResult = {
+            'number_of_records': results[0].length,
+            'page_number': pageNumber,
+            'filedata': results[0],
+            'total_number_of_records': results[2][0].total_records
         }
-    } catch (error) {
-        console.log(error)
-        let message = 'Server is unable to process your request.';
-        return res.status(500).json({
-            message: error
-        });
-    }
+        res.status(200).json(jsonResult)
+    }).catch((err)=> res.status(500).json({message: 'Server is unable to process your request'}))
+//     try {
+//         let results = await fileDataManager.getFileData(userId, pageNumber, search);
+//         console.log('Inspect result variable inside processGetSubmissionData code\n', results);
+//         if (results) {
+//             var jsonResult = {
+//                 'number_of_records': results[0].length,
+//                 'page_number': pageNumber,
+//                 'filedata': results[0],
+//                 'total_number_of_records': results[2][0].total_records
+//             }
+//             return res.status(200).json(jsonResult);
+//         }
+//     } catch (error) {
+//         console.log(error)
+//         let message = 'Server is unable to process your request.';
+//         return res.status(500).json({
+//             message: error
+//         });
+//     }
 
 }; //End of processGetSubmissionData
 exports.processGetUserData = async(req, res, next) => {
     let pageNumber = req.params.pagenumber;
     let search = req.params.search;
 
-    try {
-        let results = await userManager.getUserData(pageNumber, search);
-        console.log('Inspect result variable inside processGetUserData code\n', results);
-        if (results) {
-            var jsonResult = {
-                'number_of_records': results[0].length,
-                'page_number': pageNumber,
-                'userdata': results[0],
-                'total_number_of_records': results[2][0].total_records
-            }
-            return res.status(200).json(jsonResult);
+    userManager.getUserData(pageNumber, search).then((results)=>{
+        if(!results) throw new Error(results)
+        const jsonResult = {
+            'number_of_records': results[0].length,
+            'page_number': pageNumber,
+            'userdata': results[0],
+            'total_number_of_records': results[2][0].total_records
         }
-    } catch (error) {
-        let message = 'Server is unable to process your request.';
-        return res.status(500).json({
-            message: error
-        });
-    }
+        return res.status(200).json(jsonResult);
+    }).catch((err)=> res.status(500).json({message: 'Server is unable to process your request.'}))
+    // try {
+    //     let results = await userManager.getUserData(pageNumber, search);
+    //     console.log('Inspect result variable inside processGetUserData code\n', results);
+    //     if (results) {
+    //         var jsonResult = {
+    //             'number_of_records': results[0].length,
+    //             'page_number': pageNumber,
+    //             'userdata': results[0],
+    //             'total_number_of_records': results[2][0].total_records
+    //         }
+    //         return res.status(200).json(jsonResult);
+    //     }
+    // } catch (error) {
+    //     let message = 'Server is unable to process your request.';
+    //     return res.status(500).json({
+    //         message: error
+    //     });
+    // }
 
 }; //End of processGetUserData
 
 exports.processGetOneUserData = async(req, res, next) => {
     let recordId = req.params.recordId;
 
-    try {
-        let results = await userManager.getOneUserData(recordId);
-        console.log('Inspect result variable inside processGetOneUserData code\n', results);
-        if (results) {
-            var jsonResult = {
-                'userdata': results[0],
-            }
-            return res.status(200).json(jsonResult);
+    userManager.getOneUserData(recordId).then((results)=>{
+        if(!results) throw new Error(results)
+        const jsonResult = {
+            'userdata':results[0]
         }
-    } catch (error) {
-        let message = 'Server is unable to process your request.';
-        return res.status(500).json({
-            message: error
-        });
-    }
+        return res.status(200).json(jsonResult)
+    }).catch((err)=> res.status(500).json({message:'Server is unable to process your request.'}))
+    // try {
+    //     let results = await userManager.getOneUserData(recordId);
+    //     console.log('Inspect result variable inside processGetOneUserData code\n', results);
+    //     if (results) {
+    //         var jsonResult = {
+    //             'userdata': results[0],
+    //         }
+    //         return res.status(200).json(jsonResult);
+    //     }
+    // } catch (error) {
+    //     let message = 'Server is unable to process your request.';
+    //     return res.status(500).json({
+    //         message: error
+    //     });
+    // }
 
 }; //End of processGetOneUserData
 
 
 exports.processUpdateOneUser = async(req, res, next) => {
-    console.log('processUpdateOneUser running');
     //Collect data from the request body 
     let recordId = req.body.recordId;
     let newRoleId = req.body.roleId;
-    try {
-        results = await userManager.updateUser(recordId, newRoleId);
-        console.log(results);
-        return res.status(200).json({ message: 'Completed update' });
-    } catch (error) {
-        console.log('processUpdateOneUser method : catch block section code is running');
-        console.log(error, '=======================================================================');
-        return res.status(500).json({ message: 'Unable to complete update operation' });
-    }
+    
+    userManager.updateUser(recordId, newRoleId).then((results)=>{
+        if(results.affectedRows <1) throw new Error(results)
+        return res.status(200).json({message:'Completed update'})
+    }).catch((err)=>{
+        return res.status(500).json({message: "Unable to complete update operation"})
+    })
+    // try {
+    //     results = await userManager.updateUser(recordId, newRoleId);
+    //     console.log(results);
+    //     return res.status(200).json({ message: 'Completed update' });
+    // } catch (error) {
+    //     console.log('processUpdateOneUser method : catch block section code is running');
+    //     console.log(error, '=======================================================================');
+    //     return res.status(500).json({ message: 'Unable to complete update operation' });
+    // }
 
 
 }; //End of processUpdateOneUser
@@ -141,21 +175,28 @@ exports.processUpdateOneUser = async(req, res, next) => {
 exports.processGetOneDesignData = async(req, res, next) => {
     let recordId = req.params.fileId;
 
-    try {
-        let results = await userManager.getOneDesignData(recordId);
-        console.log('Inspect result variable inside processGetOneFileData code\n', results);
-        if (results) {
-            var jsonResult = {
-                'filedata': results[0],
-            }
-            return res.status(200).json(jsonResult);
+    userManager.getOneDesignData(recordId).then((results)=>{
+        if(!results) throw new Error(results)
+        const jsonResult = {
+            'filedata': results[0]
         }
-    } catch (error) {
-        let message = 'Server is unable to process the request.';
-        return res.status(500).json({
-            message: error
-        });
-    }
+        return res.status(200).json(jsonResult)
+    }).catch((err)=> res.status(500).json({message:'Server is unable to process the request'}))
+    // try {
+    //     let results = await userManager.getOneDesignData(recordId);
+    //     console.log('Inspect result variable inside processGetOneFileData code\n', results);
+    //     if (results) {
+    //         var jsonResult = {
+    //             'filedata': results[0],
+    //         }
+    //         return res.status(200).json(jsonResult);
+    //     }
+    // } catch (error) {
+    //     let message = 'Server is unable to process the request.';
+    //     return res.status(500).json({
+    //         message: error
+    //     });
+    // }
 
 }; //End of processGetOneDesignData
 
@@ -165,15 +206,23 @@ exports.processUpdateOneDesign = async(req, res, next) => {
     let fileId = req.body.fileId;
     let designTitle = req.body.designTitle;
     let designDescription = req.body.designDescription;
-    try {
-        results = await userManager.updateDesign(fileId, designTitle, designDescription);
-        console.log(results);
-        return res.status(200).json({ message: 'Completed update' });
-    } catch (error) {
-        console.log('processUpdateOneUser method : catch block section code is running');
-        console.log(error, '=======================================================================');
-        return res.status(500).json({ message: 'Unable to complete update operation' });
-    }
+
+    userManager.updateDesign(fileId, designTitle, designDescription).then((results)=>{
+        if(results.affectedRows < 1) throw new Error(results)
+        return res.status(200).json({message :'Completed update'})
+    }).catch((err)=>{
+        return res.status(500).json({message:'Unable to complete update operation'})
+    })
+
+    // try {
+    //     results = await userManager.updateDesign(fileId, designTitle, designDescription);
+    //     console.log(results);
+    //     return res.status(200).json({ message: 'Completed update' });
+    // } catch (error) {
+    //     console.log('processUpdateOneUser method : catch block section code is running');
+    //     console.log(error, '=======================================================================');
+    //     return res.status(500).json({ message: 'Unable to complete update operation' });
+    // }
 
 
 }; //End of processUpdateOneDesign
