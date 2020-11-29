@@ -91,15 +91,15 @@ exports.processRegister = (req, res, next) => {
                 console.log('Error on hashing password');
                 return res.status(500).json({ message: 'Unable to complete registration' });
             } else {
-                try {
-                    results = await user.createUser(fullName, email, hash);
-                    console.log(results);
-                    return res.status(200).json({ message: 'Completed registration' });
-                } catch (error) {
-                    console.log('processRegister method : catch block section code is running');
-                    console.log(error, '=======================================================================');
-                    return res.status(500).json({ message: 'Unable to complete registration' });
-                }
+            user.createUser(fullName,email,hash).then((results)=> res.status(200).json({message: 'Completed Registration'}))
+                .catch((err)=> res.status(500).json({ message: 'Unable to complete registration' }))
+                // try {
+                //     results = await user.createUser(fullName, email, hash);
+                //     return res.status(200).json({ message: 'Completed registration' });
+                // } catch (error) {
+                //     console.log(error, '=======================================================================');
+                //     return res.status(500).json({ message: 'Unable to complete registration' });
+                // }
             }
         }else{
             return res.status(500).json({ message: 'Insert appropriate passwordS' });

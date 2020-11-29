@@ -8,36 +8,45 @@ exports.processDesignSubmission = (req, res, next) => {
     let designDescription = req.body.designDescription;
     let userId = req.body.userId;
     let file = req.body.file;
-    fileDataManager.uploadFile(file, async function(error, result) {
-        console.log('check result variable in fileDataManager.upload code block\n', result);
-        console.log('check error variable in fileDataManager.upload code block\n', error);
-        let uploadResult = result;
-        if (error) {
-            let message = 'Unable to complete file submission.';
-            res.status(500).json({ message: message });
-            res.end();
-        } else {
-            //Update the file table inside the MySQL when the file image
-            //has been saved at the cloud storage (Cloudinary)
-            let imageURL = uploadResult.imageURL;
-            let publicId = uploadResult.publicId;
-            console.log('check uploadResult before calling createFileData in try block', uploadResult);
-            try {
-                let result = await fileDataManager.createFileData(imageURL, publicId, userId, designTitle, designDescription);
-                console.log('Inspert result variable inside fileDataManager.uploadFile code');
-                console.log(result);
-                if (result) {
-                    let message = 'File submission completed.';
-                    res.status(200).json({ message: message, imageURL: imageURL });
-                }
-            } catch (error) {
-                let message = 'File submission failed.';
-                res.status(500).json({
-                    message: message
-                });
-            }
-        }
-    })
+
+    let imageUrl;
+    fileDataManager.uploadFile(file).then((results)=>{
+        imageUrl = results.imageURL
+        return fileDataManager.createFileData(results.imageURL, results.publicId, userId, designTitle, designDescription)
+    }).then((results)=>{
+        res.status(200).json({message:'File Submission completed.', imageURL:imageUrl})
+    }).catch((err)=>{
+        res.status(500).json({message:'Unable to complete file submission'})
+    })// , async function(error, result) {
+    //     console.log('check result variable in fileDataManager.upload code block\n', result);
+    //     console.log('check error variable in fileDataManager.upload code block\n', error);
+    //     let uploadResult = result;
+    //     if (error) {
+    //         let message = 'Unable to complete file submission.';
+    //         res.status(500).json({ message: message });
+    //         res.end();
+    //     } else {
+    //         //Update the file table inside the MySQL when the file image
+    //         //has been saved at the cloud storage (Cloudinary)
+    //         let imageURL = uploadResult.imageURL;
+    //         let publicId = uploadResult.publicId;
+    //         console.log('check uploadResult before calling createFileData in try block', uploadResult);
+    //         try {
+    //             let result = await fileDataManager.createFileData(imageURL, publicId, userId, designTitle, designDescription);
+    //             console.log('Inspert result variable inside fileDataManager.uploadFile code');
+    //             console.log(result);
+    //             if (result) {
+    //                 let message = 'File submission completed.';
+    //                 res.status(200).json({ message: message, imageURL: imageURL });
+    //             }
+    //         } catch (error) {
+    //             let message = 'File submission failed.';
+    //             res.status(500).json({
+    //                 message: message
+    //             });
+    //         }
+    //     }
+    // })
 }; //End of processDesignSubmission
 exports.processGetSubmissionData = async(req, res, next) => {
     let pageNumber = req.params.pagenumber;

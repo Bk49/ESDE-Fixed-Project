@@ -1,5 +1,6 @@
 //Reference: https://cloudinary.com/documentation/node_integration
 const cloudinary = require('cloudinary').v2;
+const { assert } = require('console');
 const config = require('../config/config');
 const pool = require('../config/database')
 cloudinary.config({
@@ -9,55 +10,58 @@ cloudinary.config({
     upload_preset: 'upload_to_design'
 });
 
-module.exports.uploadFile = (file, callback) => {
-    console.log(file);
+module.exports.uploadFile = async (file) => {
 
     // upload image here
-    cloudinary.uploader.upload(file.path, { upload_preset: 'upload_to_design' })
+    return await cloudinary.uploader.upload(file.path, { upload_preset: 'upload_to_design' })
         .then((result) => {
+            const imageURL = result.url
+            const publicId = result.public_id
+            
             //Inspect whether I can obtain the file storage id and the url from cloudinary
             //after a successful upload.
             //console.log({imageURL: result.url, publicId: result.public_id});
-            let data = { imageURL: result.url, publicId: result.public_id, status: 'success' };
-            callback(null, data);
-            return;
+            let data = { imageURL: imageURL, publicId: publicId, status: 'success' };
+            return data;
 
         }).catch((error) => {
-
-            let message = 'fail';
-            callback(error, null);
-            return;
-
+            return error;
         });
 
 } //End of uploadFile
-module.exports.createFileData = (imageURL, publicId, userId, designTitle, designDescription) => {
+module.exports.createFileData = async (imageURL, publicId, userId, designTitle, designDescription) => {
     console.log('createFileData method is called.');
-    return new Promise((resolve, reject) => {
-        //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-        //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-        pool.getConnection((err, connection) => {
-            if (err) {
-                console.log('Database connection error ', err);
-                resolve(err);
-            } else {
-                console.log('Executing query');
-                let query = `INSERT INTO file ( cloudinary_file_id, cloudinary_url , 
-                 design_title, design_description,created_by_id ) 
-                 VALUES ('${publicId}','${imageURL}','${designTitle}','${designDescription}','${userId}') `;
+    // return new Promise((resolve, reject) => {
+    //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
+    //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
+    //     pool.getConnection((err, connection) => {
+    //         if (err) {
+    //             console.log('Database connection error ', err);
+    //             resolve(err);
+    //         } else {
+    //             console.log('Executing query');
+    //             let query = `INSERT INTO file ( cloudinary_file_id, cloudinary_url , 
+    //              design_title, design_description,created_by_id ) 
+    //              VALUES ('${publicId}','${imageURL}','${designTitle}','${designDescription}','${userId}') `;
 
-                connection.query(query, [], (err, rows) => {
-                    if (err) {
-                        console.log('Error on query on creating record inside file table', err);
-                        reject(err);
-                    } else {
-                        resolve(rows);
-                    }
-                    connection.release();
-                });
-            }
-        });
-    }); //End of new Promise object creation
+    //             connection.query(query, [], (err, rows) => {
+    //                 if (err) {
+    //                     console.log('Error on query on creating record inside file table', err);
+    //                     reject(err);
+    //                 } else {
+    //                     resolve(rows);
+    //                 }
+    //                 connection.release();
+    //             });
+    //         }
+    //     });
+    // }); //End of new Promise object creation
+    try{
+        return await pool.query(`INSERT INTO file ( cloudinary_file_id, cloudinary_url , design_title, design_description,created_by_id ) VALUES (?,?,?,?,?)`,[publicId, imageURL, designTitle, designDescription, userId])
+    }catch(err){
+        return err
+    }
+
 
 } //End of createFileData
 

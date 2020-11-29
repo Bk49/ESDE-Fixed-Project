@@ -1,27 +1,32 @@
 const config = require('../config/config');
 const pool = require('../config/database')
-module.exports.createUser = (fullname, email, password) => {
-        console.log(fullname, email, password);
-        return new Promise((resolve, reject) => {
-            //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-            //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-            pool.getConnection((err, connection) => {
-                if (err) {
-                    console.log('Database connection error ', err);
-                    resolve(err);
-                } else {
-                    connection.query('INSERT INTO user ( fullname, email, user_password, role_id) VALUES (?,?,?,2) ', [fullname, email, password], (err, rows) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(rows);
-                        }
-                        connection.release();
-                    });
-                }
-            });
-        }); //End of new Promise object creation
-
+module.exports.createUser = async (fullname, email, password) => {
+        // console.log(fullname, email, password);
+        // return new Promise((resolve, reject) => {
+        //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
+        //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
+        //     pool.getConnection((err, connection) => {
+        //         if (err) {
+        //             console.log('Database connection error ', err);
+        //             resolve(err);
+        //         } else {
+        //             connection.query('INSERT INTO user ( fullname, email, user_password, role_id) VALUES (?,?,?,2) ', [fullname, email, password], (err, rows) => {
+        //                 if (err) {
+        //                     reject(err);
+        //                 } else {
+        //                     resolve(rows);
+        //                 }
+        //                 connection.release();
+        //             });
+        //         }
+        //     });
+        // }); //End of new Promise object creation
+        try{
+            let rows = await pool.query(`INSERT INTO user ( fullname, email, user_password, role_id) VALUES (?,?,?,2) `, [fullname, email, password])
+            return rows
+        }catch(err){
+            return new Error(err)
+        }
     } //End of createUser
 
 module.exports.updateUser = (recordId, newRoleId) => {
