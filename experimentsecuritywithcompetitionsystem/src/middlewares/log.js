@@ -39,4 +39,4 @@ module.exports.logRequest = (req, res, next) => {
         return;
     }
 
-} //End of getClientUserId
+} //End of logRequest
