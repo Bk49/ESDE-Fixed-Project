@@ -1,5 +1,6 @@
 const config = require('../config/config');
 const pool = require('../config/database')
+
 module.exports.createUser = async (fullname, email, password) => {
         try{
             return await pool.query(`INSERT INTO user ( fullname, email, user_password, role_id) VALUES (?,?,?,2) `, [fullname, email, password])
@@ -9,7 +10,6 @@ module.exports.createUser = async (fullname, email, password) => {
     } //End of createUser
 
 module.exports.updateUser = async (recordId, newRoleId) => {
-
         try{
             return await pool.query(`UPDATE user SET role_id =? WHERE user_id=?`,[newRoleId, recordId])
         }catch(err){
@@ -19,7 +19,6 @@ module.exports.updateUser = async (recordId, newRoleId) => {
 
 
 module.exports.getUserData = async (pageNumber, search) => {
-        console.log('getUserData method is called.');
         const page = pageNumber;
         if (search == null) { search = ''; };
         const limit = 4; //Due to lack of test files, I have set a 3 instead of larger number such as 10 records per page
@@ -65,10 +64,9 @@ module.exports.getOneDesignData = async (recordId)=> {
     } //End of getOneDesignData
 
 module.exports.updateDesign = async (recordId, title, description) => {
-
-    try{
-        return await pool.query(`UPDATE file SET design_title =? , design_description=? WHERE file_id=?`, [title, description, recordId])
-    }catch(err){
-        return new Error(err)
-    }
+        try{
+            return await pool.query(`UPDATE file SET design_title =? , design_description=? WHERE file_id=?`, [title, description, recordId])
+        }catch(err){
+            return new Error(err)
+        }
     } //End of updateDesign

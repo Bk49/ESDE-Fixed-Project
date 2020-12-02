@@ -1,6 +1,5 @@
 //Reference: https://cloudinary.com/documentation/node_integration
 const cloudinary = require('cloudinary').v2;
-const { assert } = require('console');
 const config = require('../config/config');
 const pool = require('../config/database')
 cloudinary.config({
@@ -11,8 +10,7 @@ cloudinary.config({
 });
 
 module.exports.uploadFile = async (file) => {
-
-    // upload image here
+    // This one is not using try catch due to cloudinary functions' limitations
     return await cloudinary.uploader.upload(file.path, { upload_preset: 'upload_to_design' })
         .then((result) => {
             const imageURL = result.url
@@ -48,11 +46,7 @@ module.exports.getFileData = async (userId, pageNumber, search) => {
     const offset = (page - 1) * limit;
     let designFileDataQuery = '';
     let parameters = [];
-    //If the user did not provide any search text, the search variable
-    //should be null. The following console.log should output undefined.
-    //console.log(search);
-    //-------------- Code which does not use stored procedure -----------
-    //Query for fetching data with page number and offset (and search)
+
     if ((search == '') || (search == null)) {
         console.log('Prepare query without search text');
         designFileDataQuery = `SELECT file_id,cloudinary_url,design_title,design_description 
@@ -66,8 +60,6 @@ module.exports.getFileData = async (userId, pageNumber, search) => {
         parameters = [userId, "%" + search + "%", limit, offset, userId, "%" +search + "%"]
 
     }
-    //--------------------------------------------------------------------
-    //designFileDataQuery = `CALL sp_get_paged_file_records(?,?,?,?, @total_records); SELECT @total_records total_records;`;
 
     try{
         return await pool.query(designFileDataQuery,parameters)
