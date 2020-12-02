@@ -3,15 +3,6 @@ const fs = require('fs')
 module.exports.logRequest = (req, res, next) => {
     // req.body.userId = req.headers['user'];
     if(req){
-        // console.log(req)
-        // console.log(req.method + " " +req.url)
-        // console.log(req.params)
-        // console.log(req.query)
-        // console.log(req.body)
-        // console.log(req.files)
-        // console.log(req.socket.remoteAddress)
-        // console.log(req.socket.remoteFamily)
-        // console.log(new Date(Date.now()))
         const json = {
             datetime:new Date(Date.now()),
             request: req.method + " " +req.url,

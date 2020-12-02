@@ -1,29 +1,8 @@
 const config = require('../config/config');
 const pool = require('../config/database')
 module.exports.createUser = async (fullname, email, password) => {
-        // console.log(fullname, email, password);
-        // return new Promise((resolve, reject) => {
-        //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-        //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-        //     pool.getConnection((err, connection) => {
-        //         if (err) {
-        //             console.log('Database connection error ', err);
-        //             resolve(err);
-        //         } else {
-        //             connection.query('INSERT INTO user ( fullname, email, user_password, role_id) VALUES (?,?,?,2) ', [fullname, email, password], (err, rows) => {
-        //                 if (err) {
-        //                     reject(err);
-        //                 } else {
-        //                     resolve(rows);
-        //                 }
-        //                 connection.release();
-        //             });
-        //         }
-        //     });
-        // }); //End of new Promise object creation
         try{
-            let rows = await pool.query(`INSERT INTO user ( fullname, email, user_password, role_id) VALUES (?,?,?,2) `, [fullname, email, password])
-            return rows
+            return await pool.query(`INSERT INTO user ( fullname, email, user_password, role_id) VALUES (?,?,?,2) `, [fullname, email, password])
         }catch(err){
             return new Error(err)
         }
@@ -36,26 +15,6 @@ module.exports.updateUser = async (recordId, newRoleId) => {
         }catch(err){
             return new Error(err)
         }
-        // return new Promise((resolve, reject) => {
-        //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-        //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-        //     pool.getConnection((err, connection) => {
-        //         if (err) {
-        //             console.log('Database connection error ', err);
-        //             resolve(err);
-        //         } else {
-        //             connection.query(`UPDATE user SET role_id =${newRoleId} WHERE user_id=${recordId}`, (err, rows) => {
-        //                 if (err) {
-        //                     reject(err);
-        //                 } else {
-        //                     resolve(rows);
-        //                 }
-        //                 connection.release();
-        //             });
-        //         }
-        //     });
-        // }); //End of new Promise object creation
-
     } //End of updateUser
 
 
@@ -68,11 +27,6 @@ module.exports.getUserData = async (pageNumber, search) => {
         let userDataQuery;
         let parameters;
 
-        //If the user did not provide any search text, the search variable
-        //should be null. The following console.log should output undefined.
-        //console.log(search);
-        //-------------- Code which does not use stored procedure -----------
-        //Query for fetching data with page number, search text and offset value
         if ((search == '') || (search == null)) {
             console.log('Prepare query without search text');
             userDataQuery = `SELECT user_id, fullname, email, role_name 
@@ -91,30 +45,6 @@ module.exports.getUserData = async (pageNumber, search) => {
         }catch(err){
             return new Error(err)
         }
-
-
-        // return new Promise((resolve, reject) => {
-        //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-        //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-        //     pool.getConnection((err, connection) => {
-        //         if (err) {
-        //             console.log('Database connection error ', err);
-        //             resolve(err);
-        //         } else {
-
-        //             connection.query(userDataQuery, [search, offset, limit], (err, results) => {
-        //                 if (err) {
-        //                     reject(err);
-        //                 } else {
-        //                     console.log('Accessing total number of rows : ', results[2][0].total_records);
-        //                     resolve(results);
-        //                 }
-        //                 connection.release();
-        //             });
-        //         }
-        //     });
-        // }); //End of new Promise object creation
-
     } //End of getUserData
 
 module.exports.getOneUserData = async (recordId)=> {
@@ -124,26 +54,6 @@ module.exports.getOneUserData = async (recordId)=> {
         }catch(err){
             return new Error(err)
         }
-        // return new Promise((resolve, reject) => {
-        //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-        //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-        //     pool.getConnection((err, connection) => {
-        //         if (err) {
-        //             console.log('Database connection error ', err);
-        //             resolve(err);
-        //         } else {
-        //             connection.query(userDataQuery, (err, results) => {
-        //                 if (err) {
-        //                     reject(err);
-        //                 } else {
-        //                     resolve(results);
-        //                 }
-        //                 connection.release();
-        //             });
-        //         }
-        //     });
-        // }); //End of new Promise object creation
-
     } //End of getOneUserData
 
 module.exports.getOneDesignData = async (recordId)=> {
@@ -152,26 +62,6 @@ module.exports.getOneDesignData = async (recordId)=> {
         }catch(err){
             return new Error(err)
         }
-        // return new Promise((resolve, reject) => {
-        //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-        //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-        //     pool.getConnection((err, connection) => {
-        //         if (err) {
-        //             console.log('Database connection error ', err);
-        //             resolve(err);
-        //         } else {
-        //             connection.query(userDataQuery, (err, results) => {
-        //                 if (err) {
-        //                     reject(err);
-        //                 } else {
-        //                     resolve(results);
-        //                 }
-        //                 connection.release();
-        //             });
-        //         }
-        //     });
-        // }); //End of new Promise object creation
-
     } //End of getOneDesignData
 
 module.exports.updateDesign = async (recordId, title, description) => {
@@ -181,25 +71,4 @@ module.exports.updateDesign = async (recordId, title, description) => {
     }catch(err){
         return new Error(err)
     }
-
-        // return new Promise((resolve, reject) => {
-        //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-        //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-        //     pool.getConnection((err, connection) => {
-        //         if (err) {
-        //             console.log('Database connection error ', err);
-        //             resolve(err);
-        //         } else {
-        //             connection.query(`UPDATE file SET design_title ='${title}' , design_description='${description}' WHERE file_id=${recordId}`, (err, rows) => {
-        //                 if (err) {
-        //                     reject(err);
-        //                 } else {
-        //                     resolve(rows);
-        //                 }
-        //                 connection.release();
-        //             });
-        //         }
-        //     });
-        // }); //End of new Promise object creation
-
     } //End of updateDesign

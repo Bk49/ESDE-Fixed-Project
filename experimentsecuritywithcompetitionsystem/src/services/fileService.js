@@ -31,35 +31,11 @@ module.exports.uploadFile = async (file) => {
 } //End of uploadFile
 module.exports.createFileData = async (imageURL, publicId, userId, designTitle, designDescription) => {
     console.log('createFileData method is called.');
-    // return new Promise((resolve, reject) => {
-    //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-    //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-    //     pool.getConnection((err, connection) => {
-    //         if (err) {
-    //             console.log('Database connection error ', err);
-    //             resolve(err);
-    //         } else {
-    //             console.log('Executing query');
-    //             let query = `INSERT INTO file ( cloudinary_file_id, cloudinary_url , 
-    //              design_title, design_description,created_by_id ) 
-    //              VALUES ('${publicId}','${imageURL}','${designTitle}','${designDescription}','${userId}') `;
 
-    //             connection.query(query, [], (err, rows) => {
-    //                 if (err) {
-    //                     console.log('Error on query on creating record inside file table', err);
-    //                     reject(err);
-    //                 } else {
-    //                     resolve(rows);
-    //                 }
-    //                 connection.release();
-    //             });
-    //         }
-    //     });
-    // }); //End of new Promise object creation
     try{
         return await pool.query(`INSERT INTO file ( cloudinary_file_id, cloudinary_url , design_title, design_description,created_by_id ) VALUES (?,?,?,?,?)`,[publicId, imageURL, designTitle, designDescription, userId])
     }catch(err){
-        return err
+        return new Error(err);
     }
 
 
@@ -96,32 +72,6 @@ module.exports.getFileData = async (userId, pageNumber, search) => {
     try{
         return await pool.query(designFileDataQuery,parameters)
     }catch(err){
-        return err
+        return new Error(err)
     }
-
-    // return new Promise((resolve, reject) => {
-    //     //I referred to https://www.codota.com/code/javascript/functions/mysql/Pool/getConnection
-    //     //to prepare the following code pattern which does not use callback technique (uses Promise technique)
-    //     pool.getConnection((err, connection) => {
-    //         if (err) {
-    //             console.log('Database connection error ', err);
-    //             resolve(err);
-    //         } else {
-    //             console.log('Executing query to obtain 1 page of 3 data');
-    //             connection.query(designFileDataQuery, parameters, (err, results) => {
-    //                 if (err) {
-    //                     console.log('Error on query on reading data from the file table', err);
-    //                     reject(err);
-    //                 } else {
-    //                     //The following code which access the SQL return value took 2 hours of trial
-    //                     //and error.
-    //                     console.log('Accessing total number of rows : ', results[2][0].total_records);
-    //                     resolve(results);
-    //                 }
-    //                 connection.release();
-    //             });
-    //         }
-    //     });
-    // }); //End of new Promise object creation
-
 } //End of getFileData
