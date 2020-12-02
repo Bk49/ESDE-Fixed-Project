@@ -33,7 +33,9 @@ exports.processGetSubmissionData = async(req, res, next) => {
             'total_number_of_records': results[2][0].total_records
         }
         res.status(200).json(jsonResult)
-    }).catch((err)=> res.status(500).json({message: 'Server is unable to process your request'}))
+    }).catch((err)=> {
+        res.status(500).json({message: 'Server is unable to process your request'})
+    })
 
 }; //End of processGetSubmissionData
 exports.processGetUserData = async(req, res, next) => {
@@ -49,7 +51,9 @@ exports.processGetUserData = async(req, res, next) => {
             'total_number_of_records': results[2][0].total_records
         }
         return res.status(200).json(jsonResult);
-    }).catch((err)=> res.status(500).json({message: 'Server is unable to process your request.'}))
+    }).catch((err)=> {
+        res.status(500).json({message: 'Server is unable to process your request.'})
+    })
 
 }; //End of processGetUserData
 
@@ -62,7 +66,9 @@ exports.processGetOneUserData = async(req, res, next) => {
             'userdata':results[0]
         }
         return res.status(200).json(jsonResult)
-    }).catch((err)=> res.status(500).json({message:'Server is unable to process your request.'}))
+    }).catch((err)=> {
+        res.status(500).json({message:'Server is unable to process your request.'})
+    })
 }; //End of processGetOneUserData
 
 
@@ -88,7 +94,9 @@ exports.processGetOneDesignData = async(req, res, next) => {
             'filedata': results[0]
         }
         return res.status(200).json(jsonResult)
-    }).catch((err)=> res.status(500).json({message:'Server is unable to process the request'}))
+    }).catch((err)=>{
+        res.status(500).json({message:'Server is unable to process the request'})
+    })
 }; //End of processGetOneDesignData
 
 exports.processUpdateOneDesign = async(req, res, next) => {

@@ -26,8 +26,7 @@ exports.processLogin = (req, res, next) => {
             }
         }else return res.status(500).json({message:'login failed'})
     }).catch((err) => {
-        console.log(err)
-        res.status(500).json({message:'login failed'})
+        return res.status(500).json({message:'login failed'})
     })
 }
 
