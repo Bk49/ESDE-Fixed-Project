@@ -43,7 +43,7 @@ exports.processGetUserData = async(req, res, next) => {
     let search = req.params.search;
 
     userManager.getUserData(pageNumber, search).then((results)=>{
-        if(!results) throw new Error(results)
+        //if(!results) throw new Error(results)
         const jsonResult = {
             'number_of_records': results[0].length,
             'page_number': pageNumber,
