@@ -7,10 +7,9 @@ const jwt = require('jsonwebtoken');
 
 
 exports.processLogin = (req, res, next) => {
+    const email = req.body.email;
+    const password = req.body.password;
 
-    let email = req.body.email;
-    let password = req.body.password;
-    // try {
     auth.authenticate(email).then((results)=>{
         if(results.length == 1){
             if((password == null) || (results[0] == null)) return res.status(500).json({message: 'login failed'})
@@ -26,18 +25,16 @@ exports.processLogin = (req, res, next) => {
             }
         }else return res.status(500).json({message:'login failed'})
     }).catch((err) => {
+        console.log(err)
         return res.status(500).json({message:'login failed'})
     })
 }
 
-// If user submitted data, run the code in below
 exports.processRegister = (req, res, next) => {
-    console.log('processRegister running');
-    let fullName = req.body.fullName;
-    let email = req.body.email;
-    let password = req.body.password;
-    var passwordReg = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,18}$/;
-    console.log(passwordReg.test(password))
+    const fullName = req.body.fullName;
+    const email = req.body.email;
+    const password = req.body.password;
+    const passwordReg = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,18}$/;
 
     bcrypt.hash(password, 10, async(err, hash) => {
         if(passwordReg.test(password)){
@@ -46,13 +43,13 @@ exports.processRegister = (req, res, next) => {
                 return res.status(500).json({ message: 'Unable to complete registration' });
             } else {
             user.createUser(fullName,email,hash).then((results)=> res.status(200).json({message: 'Completed Registration'}))
-                .catch((err)=> res.status(500).json({ message: 'Unable to complete registration' }))
+                .catch((err)=>{
+                    console.log(err)
+                    res.status(500).json({ message: 'Unable to complete registration' })
+                })
             }
         }else{
             return res.status(500).json({ message: 'Insert appropriate passwordS' });
         }
-
     });
-
-
 }; //End of processRegister
