@@ -5,9 +5,13 @@ const formData = require('express-form-data');
 const fs = require('fs')
 //const dummyUserFn = require('./src/middlewares/dummyUserFn');
 
+// Configuring cors
+var corsOptions = {
+    origin: 'http://localhost:3001',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  }
 let app = express();
-app.use('*', cors());
-
+app.use('*', cors(corsOptions));
 
 //Server Settings
 const PORT = 5000;
@@ -64,7 +68,7 @@ app.use(express.static(rootPath));
 bootstrap(app, router);
 
 //Index Page (Home public page)
-router.get('/', (req, res, next) => {
+router.get('/', cors(corsOptions), (req, res, next) => {
     res.send('<html><title>Backend API system for experimenting security concept</title><body>This project provides only backend API support</body></html>');
     res.end();
 });

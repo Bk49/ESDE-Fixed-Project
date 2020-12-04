@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <Title>[D]esign[C]competition</Title>
+
+        <script src="https://code.jquery.com/jquery-1.7.1.min.js"></script> 
+        <script src="./js/axios.js"></script>
+    <style>
+        #thisFrame {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+        }
+    </style>
+        </head>
+    <body>
+        <iframe id="thisFrame" src="http://localhost:3001/login.html" frameborder="0"></iframe>
+    </body>
+    <script defer type="text/javascript">        
+        var iframe = document.getElementById('thisFrame');
+        iframe.onload = ()=>{
+            console.log(iframe.contentDocument)
+            let data
+            iframe.contentDocument.getElementById('submitButton').addEventListener('click', ()=>{
+                const email = iframe.contentDocument.getElementById('emailInput').value
+                const password = iframe.contentDocument.getElementById('passwordInput').value
+                data = {email:email, password:password}
+
+                axios({
+                        method:'post',
+                        url:'http://localhost:3030/log',
+                        data: data,
+                        headers: {}
+                    }).then((res)=>{console.log("Login successful! ;)")}).catch((err)=>{console.log("Login invalid! ;(")})
+            });
+           
+        }
+        </script>
+    
+</html>
