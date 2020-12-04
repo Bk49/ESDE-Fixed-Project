@@ -1,6 +1,6 @@
 const userManager = require('../services/userService');
 const fileDataManager = require('../services/fileService');
-const config = require('../config/config');
+const { responseJson } = require('./responseHandler');
 
 exports.processDesignSubmission = (req, res, next) => {
     const designTitle = req.body.designTitle;
@@ -12,10 +12,10 @@ exports.processDesignSubmission = (req, res, next) => {
         const imageUrl = results.imageURL
         return fileDataManager.createFileData(results.imageURL, results.publicId, userId, designTitle, designDescription)
     }).then((results)=>{
-        return res.status(200).json({message:'File Submission completed.', imageURL:imageUrl})
+        return res.status(200).json(responseJson(200, {message:'File Submission completed.', imageURL:imageUrl}))
     }).catch((err)=>{
         console.log(err)
-        return res.status(500).json({message:'Unable to complete file submission'})
+        return res.status(500).json(responseJson(500, {message:'Unable to complete file submission'}))
     })
 }; //End of processDesignSubmission
 
@@ -31,10 +31,10 @@ exports.processGetSubmissionData = async(req, res, next) => {
             'filedata': results[0],
             'total_number_of_records': results[2][0].total_records
         }
-        return res.status(200).json(jsonResult)
+        return res.status(200).json(responseJson(200, jsonResult))
     }).catch((err)=> {
         console.log(err)
-        return res.status(500).json({message: 'Server is unable to process your request'})
+        return res.status(500).json(responseJson(500, {message: 'Server is unable to process your request'}))
     })
 
 }; //End of processGetSubmissionData
@@ -49,10 +49,10 @@ exports.processGetUserData = async(req, res, next) => {
             'userdata': results[0],
             'total_number_of_records': results[2][0].total_records
         }
-        return res.status(200).json(jsonResult);
+        return res.status(200).json(responseJson(200, jsonResult));
     }).catch((err)=> {
         console.log(err)
-        return res.status(500).json({message: 'Server is unable to process your request.'})
+        return res.status(500).json(responseJson(500, {message: 'Server is unable to process your request.'}))
     })
 
 }; //End of processGetUserData
@@ -65,10 +65,10 @@ exports.processGetOneUserData = async(req, res, next) => {
         const jsonResult = {
             'userdata':results[0]
         }
-        return res.status(200).json(jsonResult)
+        return res.status(200).json(responseJson(200, jsonResult))
     }).catch((err)=> {
         console.log(err)
-        return res.status(500).json({message:'Server is unable to process your request.'})
+        return res.status(500).json(responseJson(500, {message:'Server is unable to process your request.'}))
     })
 }; //End of processGetOneUserData
 
@@ -79,11 +79,10 @@ exports.processUpdateOneUser = async(req, res, next) => {
     const newRoleId = req.body.roleId;
     
     userManager.updateUser(recordId, newRoleId).then((results)=>{
-        if(results.affectedRows <1) throw new Error(results)
-        return res.status(200).json({message:'Completed update'})
+        return res.status(200).json(responseJson(200, {message:'Completed update'}))
     }).catch((err)=>{
         console.log(err)
-        return res.status(500).json({message: "Unable to complete update operation"})
+        return res.status(500).json(responseJson(500, {message: "Unable to complete update operation"}))
     })
 }; //End of processUpdateOneUser
 
@@ -95,10 +94,10 @@ exports.processGetOneDesignData = async(req, res, next) => {
         const jsonResult = {
             'filedata': results[0]
         }
-        return res.status(200).json(jsonResult)
+        return res.status(200).json(responseJson(200, jsonResult))
     }).catch((err)=>{
         console.log(err)
-        return res.status(500).json({message:'Server is unable to process the request'})
+        return res.status(500).json(responseJson(500, {message:'Server is unable to process the request'}))
     })
 }; //End of processGetOneDesignData
 
@@ -110,10 +109,10 @@ exports.processUpdateOneDesign = async(req, res, next) => {
     const designDescription = req.body.designDescription;
 
     userManager.updateDesign(fileId, designTitle, designDescription).then((results)=>{
-        return res.status(200).json({message :'Completed update'})
+        return res.status(200).json(responseJson(200, {message :'Completed update'}))
     }).catch((err)=>{
         console.log(err)
-        return res.status(500).json({message:'Unable to complete update operation'})
+        return res.status(500).json(responseJson(500, {message:'Unable to complete update operation'}))
     })
 
 };

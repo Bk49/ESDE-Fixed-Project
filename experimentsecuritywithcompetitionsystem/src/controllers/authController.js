@@ -3,7 +3,7 @@ const auth = require('../services/authService');
 const bcrypt = require('bcrypt');
 const config = require('../config/config');
 const jwt = require('jsonwebtoken');
-
+const {responseJson} = require('./responseHandler')
 
 
 exports.processLogin = (req, res, next) => {
@@ -11,8 +11,8 @@ exports.processLogin = (req, res, next) => {
     const password = req.body.password;
 
     auth.authenticate(email).then((results)=>{
-        if(results.length == 1){
-            if((password == null) || (results[0] == null)) return res.status(500).json({message: 'login failed'})
+        if(results.length >= 1){
+            if((password == null) || (results[0] == null)) return res.status(500).json(responseJson(500, {message: 'Login Failed'}))
             if(bcrypt.compareSync(password, results[0].user_password) == true){
                 let data = {
                     user_id: results[0].user_id,
@@ -21,12 +21,12 @@ exports.processLogin = (req, res, next) => {
                         expiresIn: 86400 //Expires in 24 hrs
                     })
                 }
-                return res.status(200).json(data)
-            }
-        }else return res.status(500).json({message:'login failed'})
+                return res.status(200).json(responseJson(200, data))
+            }else return res.status(401).json(responseJson(401, {message:'Invalid Password'}))
+        }else return res.status(500).json(responseJson(404, {message:'Email Not Found'}))
     }).catch((err) => {
         console.log(err)
-        return res.status(500).json({message:'login failed'})
+        return res.status(500).json(responseJson(500, {message:'Login Failed'}))
     })
 }
 
@@ -38,18 +38,16 @@ exports.processRegister = (req, res, next) => {
 
     bcrypt.hash(password, 10, async(err, hash) => {
         if(passwordReg.test(password)){
-            if (err) {
-                console.log('Error on hashing password');
-                return res.status(500).json({ message: 'Unable to complete registration' });
-            } else {
-            user.createUser(fullName,email,hash).then((results)=> res.status(200).json({message: 'Completed Registration'}))
+            if (err) return res.status(500).json(responseJson(500, {message:'Unable to complete registration'}));
+            else {
+            user.createUser(fullName,email,hash).then((results)=> res.status(200).json(responseJson(200, {message:'Completed Registration'})))
                 .catch((err)=>{
                     console.log(err)
-                    res.status(500).json({ message: 'Unable to complete registration' })
+                    res.status(500).json(responseJson(500, {message:'Unable to complete registration'}))
                 })
             }
         }else{
-            return res.status(500).json({ message: 'Insert appropriate passwordS' });
+            return res.status(400).json(responseJson(400, {message:'Insert appropriate passwords'}));
         }
     });
 }; //End of processRegister

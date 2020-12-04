@@ -1,3 +1,5 @@
+const {responseJson} = require('../controllers/responseHandler')
+
 module.exports.getClientUserId = (req, res, next) => {
         console.log('http header - user ', req.headers['user']);
         req.body.userId = req.headers['user'];
@@ -6,7 +8,7 @@ module.exports.getClientUserId = (req, res, next) => {
             next()
             return;
         } else {
-            res.status(403).json({ message: 'Unauthorized access' });
+            res.status(403).json(responseJson(403, { message: 'Unauthorized access' }));
             return;
         }
 

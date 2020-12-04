@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require('cors')
 const config = require('./src/config/config');
 const formData = require('express-form-data');
+const fs = require('fs')
 //const dummyUserFn = require('./src/middlewares/dummyUserFn');
 
 let app = express();
@@ -83,6 +84,17 @@ process.on('uncaughtException', function(error, origin) {
     console.log('process.on method is automatically called for unhandled errors:\n ',
         error, 'origin:\n',
         origin);
+        let logs;
+    fs.readFile('logs.json', (err, data)=>{
+        if(err) console.log(err)
+        logs = JSON.parse(data)
+    })
+    if(typeof logs != 'array') logs = []
+    logs.push({timestamp: new Date(),origin: origin, error: error})
+
+    fs.writeFile('logs.json', logs, (err)=>{
+        if(err) console.log(err)
+    })
     process.exit(1);
 })
 
