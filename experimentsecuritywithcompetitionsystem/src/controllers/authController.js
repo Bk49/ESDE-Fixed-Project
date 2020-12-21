@@ -5,7 +5,7 @@ const config = require('../config/config');
 const jwt = require('jsonwebtoken');
 const { responseJson } = require('./responseHandler')
 const { RateLimiterMemory } = require('rate-limiter-flexible');
-
+const validator =require('validator');
 
 const maxWrongAttemptsByIPperMinute = 5;
 
@@ -80,7 +80,7 @@ exports.processRegister = (req, res, next) => {
     const passwordReg = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,18}$/;
 
     bcrypt.hash(password, 10, async (err, hash) => {
-        if (passwordReg.test(password)) {
+        if (passwordReg.test(password) && validator.isEmail(email) && (validator.isAlphanumeric(fullName))) {
             if (err) return res.status(500).json(responseJson(500, { message: 'Unable to complete registration' }));
             else {
                 user.createUser(fullName, email, hash).then((results) => res.status(200).json(responseJson(200, { message: 'Completed Registration' })))
@@ -90,7 +90,7 @@ exports.processRegister = (req, res, next) => {
                     })
             }
         } else {
-            return res.status(400).json(responseJson(400, { message: 'Insert appropriate passwords' }));
+            return res.status(400).json(responseJson(400, { message: 'Insert appropriate input' }));
         }
     });
 }; //End of processRegister

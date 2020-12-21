@@ -60,13 +60,11 @@ if ($registerFormContainer.length != 0) {
                     if (password.search(/(?=.*?[#?!@$%^&*-])/) < 0) {
                         errors.push("Your password must contain at least one special character."); 
                     }
-                    if (errors.length > 0) {
+
                         for(var i = 0; i < errors.length; i++)
                         errText += errors[i] + "<br>"
                         document.getElementById("pwError").innerHTML = errText;
 
-
-                    }
                 
                 
             });
