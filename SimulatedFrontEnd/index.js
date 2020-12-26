@@ -2,6 +2,8 @@
 const express=require('express');
 const serveStatic=require('serve-static');
 
+const https = require('https')
+const fs = require('fs')
 
 var hostname="localhost";
 var port=3001;
@@ -25,6 +27,11 @@ app.use(function(req,res,next){
     }
 });
 
+//Configuring SSL
+const httpsOptions = {
+    key: fs.readFileSync('../experimentsecuritywithcompetitionsystem/security/cert.key'),
+    cert: fs.readFileSync('../experimentsecuritywithcompetitionsystem/security/cert.pem')
+}
 
 app.use(serveStatic(__dirname+"/public"));
 
@@ -34,7 +41,7 @@ app.get("/", (req, res) => {
 });
 
 
-app.listen(port,hostname,function(){
+https.createServer(httpsOptions, app).listen(port,hostname,function(){
 
-    console.log(`Server hosted at http://${hostname}:${port}`);
+    console.log(`Server hosted at https://${hostname}:${port}`);
 });

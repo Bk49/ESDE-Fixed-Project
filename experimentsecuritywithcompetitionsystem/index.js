@@ -3,7 +3,11 @@ const cors = require('cors')
 const config = require('./src/config/config');
 const formData = require('express-form-data');
 const fs = require('fs')
+const https = require('https')
+
 //const dummyUserFn = require('./src/middlewares/dummyUserFn');
+
+
 
 // Configuring cors
 var corsOptions = {
@@ -12,6 +16,12 @@ var corsOptions = {
   }
 let app = express();
 app.use('*', cors(corsOptions));
+
+//Configuring SSL
+const httpsOptions = {
+    key: fs.readFileSync('./security/cert.key'),
+    cert: fs.readFileSync('./security/cert.pem')
+}
 
 //Server Settings
 const PORT = 5000;
@@ -43,12 +53,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //has file submission functionality.
 //app.use(express.json());
 //app.use(express.urlencoded({ extended: true }));
-
-
-
-
-
-
 
 
 
@@ -104,7 +108,7 @@ process.on('uncaughtException', function(error, origin) {
 
 
 
-app.listen(PORT, err => {
+https.createServer(httpsOptions, app).listen(PORT, err => {
     if (err) return console.log(`Cannot Listen on PORT: ${PORT}`);
-    console.log(`Server is Listening on: http://localhost:${PORT}/`);
+    console.log(`Server is Listening on: https://localhost:${PORT}/`);
 });
